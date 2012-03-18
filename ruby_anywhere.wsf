@@ -1,0 +1,97 @@
+#!/bin/bash
+#<job><script language="JScript">/*
+
+RUBY_EXEC=`which ruby`
+if [ -n "$RUBY_EXEC" ]; then
+  "$RUBY_EXEC" -x $0 $1 $2
+  exit $?
+else
+  echo 'Ruby not found!'
+  echo 'Installing in 10 sec (press Ctrl-C NOW to exit)'
+  for in in {1..10}; do
+    echo -n '. '
+    sleep 1
+  done
+  echo 'Installing'
+  bash -s stable < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)
+  if [ -e ~/.bash_profile ]; then
+    source ~/.bash_profile
+  else
+    source ~/.rvm/scripts/rvm
+  fi
+  rvm --default install 1.9.3
+  RUBY_EXEC=`which ruby`
+  if [ -n "$RUBY_EXEC" ]; then
+    "$RUBY_EXEC" -x $0 $1 $2
+    EXT=$?
+    echo 'To finalize Ruby installation execute: source ~/.bash_profile'
+    exit $EXT
+  else
+    echo 'Ruby installation failed, please install manually.'
+    exit 2
+  fi
+fi
+
+*/
+</script>
+<script language="VBScript">
+
+Sub ruby_install
+  strFileURL = "http://files.rubyforge.vm.bytemark.co.uk/rubyinstaller/rubyinstaller-1.9.3-p125.exe"
+  strHDLocation = "rubyinstaller-1.9.3-p125.exe"
+  Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
+  objXMLHTTP.open "GET", strFileURL, false
+  objXMLHTTP.send()
+  If objXMLHTTP.Status = 200 Then
+    Set objADOStream = CreateObject("ADODB.Stream")
+    objADOStream.Open
+    objADOStream.Type = 1 'adTypeBinary
+    objADOStream.Write objXMLHTTP.ResponseBody
+    objADOStream.Position = 0    'Set the stream position to the start
+    Set objFSO = Createobject("Scripting.FileSystemObject")
+    If objFSO.Fileexists(strHDLocation) Then objFSO.DeleteFile strHDLocation
+    Set objFSO = Nothing
+    objADOStream.SaveToFile strHDLocation
+    objADOStream.Close
+    Set objADOStream = Nothing
+  End if
+  Set objXMLHTTP = Nothing
+  Set wshShell = WScript.CreateObject ("WSCript.shell")
+  wshshell.run "rubyinstaller-1.9.3-p125.exe /tasks=assocfiles,modpath", 6, True
+  set wshshell = nothing
+End Sub
+
+Set wshShell = WScript.CreateObject ("WSCript.shell")
+On Error Resume Next
+wshshell.run "ruby -version", 6, True
+If Err.Number <> 0 Then
+  WshShell.Popup("Ruby not found in PATH, will download (9Mb) and install. " + Err.Number)
+  ruby_install
+  Err.Clear
+End If
+On Error Goto 0
+set wshshell = nothing
+
+Set wshShell = WScript.CreateObject ("WSCript.shell")
+Result = InputBox("Parameter", "Parameter", "", 100, 100)
+Result = "C:\Ruby193\bin\ruby -x ruby_anywhere.wsf " + Result
+WshShell.Popup(Result)
+wshshell.run Result, 6, True
+set wshshell = nothing
+
+WScript.Quit
+
+</script>
+
+<script language="JScript">
+/*
+#!/usr/bin/env ruby -w
+
+p "Hello World! Parameter: #{ARGV[0]}. Put your script here."
+
+=begin
+*/
+</script>
+</job>
+=end
+
