@@ -76,7 +76,7 @@ Set wshShell = WScript.CreateObject ("WSCript.shell")
 Result = InputBox("Parameter", "Parameter", "", 100, 100)
 Result = "C:\Ruby193\bin\ruby -x ruby_anywhere.wsf " + Result
 WshShell.Popup(Result)
-wshshell.run Result, 6, True
+wshshell.run Result, 1, True
 set wshshell = nothing
 
 WScript.Quit
@@ -88,6 +88,8 @@ WScript.Quit
 #!/usr/bin/env ruby -w
 
 p "Hello World! Parameter: #{ARGV[0]}. Put your script here."
+p 'Press enter to end'
+STDIN.gets 
 
 =begin
 */
